@@ -13,8 +13,6 @@ public class AccountApiController {
 //    String home() {
 //        return "Hello World!";
 //    }
-    //asdasdsd
-    //asdsads
     @RequestMapping(value = "/account/{accountID}")
     public ResponseEntity<Account> getProduct(@PathVariable("accountID") String accountID) {
         Account account = new DBAccounts().getAccount(accountID);
