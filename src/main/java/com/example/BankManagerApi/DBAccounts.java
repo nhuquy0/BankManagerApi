@@ -123,11 +123,11 @@ public class DBAccounts {
                 account.setCountry(rs.getString(8));
                 account.setPhoneNumber(rs.getString(9));
                 account.setEmail(rs.getString(10));
-                System.out.println(rs.getString(1) + "\t" + rs.getString(2)
-                        + "\t" + rs.getBigDecimal(3) + "\t" + rs.getString(4)
-                        + "\t" + rs.getString(5) + "\t" + rs.getString(6)
-                        + "\t" + rs.getString(7) + "\t" + rs.getString(8)
-                        + "\t" + rs.getString(9) + "\t" + rs.getString(10));
+//                System.out.println(rs.getString(1) + "\t" + rs.getString(2)
+//                        + "\t" + rs.getBigDecimal(3) + "\t" + rs.getString(4)
+//                        + "\t" + rs.getString(5) + "\t" + rs.getString(6)
+//                        + "\t" + rs.getString(7) + "\t" + rs.getString(8)
+//                        + "\t" + rs.getString(9) + "\t" + rs.getString(10));
             }
 
             conn.close();
@@ -203,6 +203,27 @@ public class DBAccounts {
         return uuidDB;
     }
 
+    public String getAccountIDFromUUIDs(String accountID){
+        String accountIDDB = "";
+        try{
+            // get accountBalance from table 'accounts'
+            ResultSet rs = stmt.executeQuery("select accountID from uuids WHERE "+
+                    "accountID" + " = '" + accountID + "'"
+            );
+            while (rs.next()) {
+                accountIDDB = rs.getString(1);
+            }
+
+            conn.close();
+        }catch (SQLException ex) {
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+        return accountIDDB;
+    }
+
     public ArrayList<String> getDatetimeAndUUID(){
         ArrayList<String> datetimeAndUUIDArrayList = new ArrayList<>();
         try{
@@ -265,6 +286,24 @@ public class DBAccounts {
                 System.out.println("VendorError: " + ex.getErrorCode());
                 return false;
             }
+    }
+
+    public boolean updateTransferAccountBalance(String accountID, String accountID2, String moneyTransfer){
+        String sql = "UPDATE accounts " +
+                "SET accountBalance = (case when accountID = " + "'" + accountID + "'" + " then round(" + "accountBalance" + " - " + moneyTransfer + ") " +
+                "when accountID = " + "'" + accountID2 + "'" + " then round(" + "accountBalance" + " + " + moneyTransfer + ")" + " end) " +
+                " WHERE accountID in (" + "'" + accountID + "', " + "'" + accountID2 + "')";
+        try {
+            stmt.executeUpdate(sql);
+            conn.close();
+            return true;
+        }catch (SQLException ex) {
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+            return false;
+        }
     }
 
     //Cập nhật datetime
